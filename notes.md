@@ -12,3 +12,14 @@ Optionals
     Raise an alarm if a unauthorized player enters a given area
     Log keycard uses at doors
     Clock in and clock out system
+
+Notes
+
+    For entity detector block
+        known to open computers as "os_entdetector"
+        has 4 functions:
+            getLoc() : returns the global position of the detector block (X, Y ,Z)
+            greet() : prints something
+            scanEntities(a,b,c,d) : Pushes a table with all entities in the scanning radius. Has 4(?) inputs, a, witch is related to the distance the scan will go, b, witch is a boolean that dictates weather coordinates are global or relative to the scan block, and d and c, idk what they do yet
+            scanPlayers(a,b,c,d) : Same as entities but only scans players and not entities
+            default of b is false for both scanPlayers and scanEntities

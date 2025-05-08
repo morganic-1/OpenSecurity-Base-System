@@ -5,7 +5,7 @@ local component = require("component")
 local event = require("event")
 local serialization = require("serialization")
 local modem = component.modem
-local detector = component.entity_detector
+local detector = component.os_entdetector
 local sides = require("sides")
 
 -- Open a port for communication
@@ -24,13 +24,15 @@ end
 print("Detector started. Scanning...")
 
 while true do
-    local entities = detector.scanEntities(16, 4, 16)
+    local entities = detector.scanEntities()
     for _, e in ipairs(entities) do
-    if e.name then -- likely a player
-        local time = os.date("%Y-%m-%d %H:%M:%S")
-        local dx = e.x - detector.getX()
-        local dz = e.z - detector.getZ()
-        local data = {
+        if e.name then -- likely a player
+            local time = os.date("%Y-%m-%d %H:%M:%S")
+            local detectorX = detector.getX() or 0
+            local detectorZ = detector.getZ() or 0
+            local dx = e.x - detectorX
+            local dz = e.z - detectorZ
+            local data = {
                 name = e.name,
                 x = math.floor(e.x),
                 y = math.floor(e.y),
@@ -42,5 +44,5 @@ while true do
             modem.broadcast(port, message)
         end
     end
-    os.sleep(2) -- Delay between scans
+    event.pull(2) -- Delay between scans
 end
