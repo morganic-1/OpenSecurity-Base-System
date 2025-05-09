@@ -23,3 +23,4 @@ Notes
             scanEntities(a,b,c,d) : Pushes a table with all entities in the scanning radius. Has 4(?) inputs, a, witch is related to the distance the scan will go, b, witch is a boolean that dictates weather coordinates are global or relative to the scan block, and d and c, idk what they do yet
             scanPlayers(a,b,c,d) : Same as entities but only scans players and not entities
             default of b is false for both scanPlayers and scanEntities
+            radius is centered on the block so 16 would mean 7 away from each face

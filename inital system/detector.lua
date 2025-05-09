@@ -6,7 +6,6 @@ local event = require("event")
 local serialization = require("serialization")
 local modem = component.modem
 local detector = component.os_entdetector
-local sides = require("sides")
 
 -- Open a port for communication
 local port = 123
@@ -23,26 +22,35 @@ end
 
 print("Detector started. Scanning...")
 
+local scanX, scanY, scanZ = detector.getLoc()
+
 while true do
-    local entities = detector.scanEntities()
-    for _, e in ipairs(entities) do
-        if e.name then -- likely a player
-            local time = os.date("%Y-%m-%d %H:%M:%S")
-            local detectorX = detector.getX() or 0
-            local detectorZ = detector.getZ() or 0
-            local dx = e.x - detectorX
-            local dz = e.z - detectorZ
-            local data = {
-                name = e.name,
-                x = math.floor(e.x),
-                y = math.floor(e.y),
-                z = math.floor(e.z),
-                facing = getFacing(dx, dz),
-                time = time
-            }
-            local message = serialization.serialize(data)
-            modem.broadcast(port, message)
-        end
+    print("Scanning for entities...")
+    local scan = detector.scanPlayers(64)
+    for i, entity in ipairs(scan) do
+        print("Scanned entity:", entity.name)
+        entity = scan[i]
+        local absoluteX, absoluteY, absoluteZ = entity.x, entity.y, entity.z
+        local dx, dy, dz = absoluteX - scanX, absoluteY - scanY, absoluteZ - scanZ
+        local distance = math.sqrt(dx^2 + dy^2 + dz^2)
+        local facing = getFacing(dx, dz)
+
+        local data = {
+            time = os.date("%Y-%m-%d %H:%M:%S"),
+            name = entity.name,
+            absoluteX = absoluteX,
+            absoluteY = absoluteY,
+            absoluteZ = absoluteZ,
+            dx = dx,
+            dy = dy,
+            dz = dz,
+            distance = distance,
+            facing = facing
+        }
+
+        local message = serialization.serialize(data)
+        modem.broadcast(port, message)
+        print("Sent data to Logger")
     end
-    event.pull(2) -- Delay between scans
+    os.sleep(2) -- Sleep for a second before the next scan
 end
